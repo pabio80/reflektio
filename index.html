@@ -70,10 +70,84 @@
   </div>
 
   <script>
-    // Configuración de Supabase
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Envía tu texto</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0f0f11;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: #1a1a1e;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border: 1px solid #2a2a30;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+    form { display: flex; flex-direction: column; gap: 15px; }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 1px solid #3a3a42;
+      background: #0f0f11;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { border-color: #6366f1; }
+    button {
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #4f46e5; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status { margin-top: 15px; text-align: center; font-size: 0.9rem; min-height: 20px; }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Envía tu mensaje</h1>
+    <form id="textForm">
+      <input type="text" id="userText" placeholder="Escribe algo aquí..." maxlength="280" required autocomplete="off">
+      <button type="submit" id="submitBtn">Enviar</button>
+    </form>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    // Configuración de Supabase (Raíz del dominio sin /rest/v1/)
     const SUPABASE_URL = "https://farvkpxcefmeauzdgnla.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhcnZrcHhjZWZtZWF1emRnbmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzOTM5OTMsImV4cCI6MjEwNzk2OTk5M30.G1_sqn1l7ZAEZm6mk7t1PqNTBGCnqHbLlSNBPw-_yT8";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Inicializar cliente asignándolo a 'supabaseClient' para evitar sombrear la librería 'supabase'
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const form = document.getElementById('textForm');
     const input = document.getElementById('userText');
@@ -90,21 +164,28 @@
       status.className = 'status';
       status.textContent = 'Enviando...';
 
-      const { data, error } = await supabase
-        .from('messages')
-        .insert([{ text: textValue }]);
+      try {
+        const { data, error } = await supabaseClient
+          .from('messages')
+          .insert([{ text: textValue }]);
 
-      btn.disabled = false;
+        btn.disabled = false;
 
-      if (error) {
+        if (error) {
+          console.error("Error devuelto por Supabase:", error);
+          status.className = 'status error';
+          status.textContent = `Error: ${error.message}`;
+        } else {
+          status.className = 'status success';
+          status.textContent = '¡Enviado con éxito!';
+          input.value = '';
+          setTimeout(() => { status.textContent = ''; }, 3000);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        console.error("Excepción inesperada:", err);
         status.className = 'status error';
-        status.textContent = 'Error al enviar el texto.';
-        console.error(error);
-      } else {
-        status.className = 'status success';
-        status.textContent = '¡Enviado con éxito!';
-        input.value = '';
-        setTimeout(() => { status.textContent = ''; }, 3000);
+        status.textContent = 'Error de conexión con el servidor.';
       }
     });
   </script>
