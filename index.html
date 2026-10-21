@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Envía tu texto</title>
+  <title>Envía tu texto - I/O Creative Technology</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,11 +12,49 @@
       background-color: #0f0f11;
       color: #ffffff;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 20px;
     }
+    /* Selector de idioma */
+    .lang-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+    }
+    .lang-selector button {
+      background: #1a1a1e;
+      border: 1px solid #3a3a42;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .lang-selector button:hover, .lang-selector button.active {
+      background: #6366f1;
+      border-color: #6366f1;
+    }
+    /* Contenedor del Logotipo */
+    .logo-container {
+      width: 100%;
+      max-width: 260px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .responsive-logo {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    /* Contenedor del formulario */
     .container {
       width: 100%;
       max-width: 450px;
@@ -40,7 +78,7 @@
       transition: border-color 0.2s;
     }
     input[type="text"]:focus { border-color: #6366f1; }
-    button {
+    button.submitBtn {
       padding: 14px;
       border-radius: 10px;
       border: none;
@@ -51,8 +89,8 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    button:hover { background: #4f46e5; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    button.submitBtn:hover { background: #4f46e5; }
+    button.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
     .status { margin-top: 15px; text-align: center; font-size: 0.9rem; min-height: 20px; }
     .success { color: #10b981; }
     .error { color: #ef4444; }
@@ -60,16 +98,71 @@
 </head>
 <body>
 
+  <!-- Selector de Idioma -->
+  <div class="lang-selector">
+    <button id="btn-es" class="active" onclick="setLanguage('es')">ES</button>
+    <button id="btn-ca" onclick="setLanguage('ca')">CA</button>
+  </div>
+
+  <!-- Logotipo Corporativo -->
+  <div class="logo-container">
+    <!-- Asegúrate de cambiar 'logo.jpg' por el nombre real de tu archivo de imagen subido a la carpeta public/ -->
+    <img src="logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
+  </div>
+
   <div class="container">
-    <h1>Envía tu mensaje</h1>
+    <h1 data-key="title">Envía tu mensaje</h1>
     <form class="textForm">
-      <input type="text" class="userText" placeholder="Escribe algo aquí..." maxlength="280" required autocomplete="off">
-      <button type="submit" class="submitBtn">Enviar</button>
+      <input type="text" class="userText" data-key="placeholder" placeholder="Escribe algo aquí..." maxlength="280" required autocomplete="off">
+      <button type="submit" class="submitBtn" data-key="submit">Enviar</button>
     </form>
-    <div class="status"></div>
+    <div class="status" data-status-default=""></div>
   </div>
 
   <script>
+    // --- Sistema Multilingüe ---
+    const translations = {
+      es: {
+        title: "Envía tu mensaje",
+        placeholder: "Escribe algo aquí...",
+        submit: "Enviar",
+        sending: "Enviando...",
+        success: "¡Enviado con éxito!",
+        errorConn: "Error de conexión con el servidor."
+      },
+      ca: {
+        title: "Escriu el teu missatge",
+        placeholder: "Escriu alguna cosa aquí...",
+        submit: "Enviar",
+        sending: "Enviant...",
+        success: "Enviat amb èxit!",
+        errorConn: "Error de connexió amb el servidor."
+      }
+    };
+
+    let currentLang = 'es';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      
+      // Actualizar botones activos
+      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+      document.getElementById('btn-ca').classList.toggle('active', lang === 'ca');
+
+      // Traducir elementos estáticos
+      document.querySelectorAll("[data-key]").forEach(element => {
+        const key = element.getAttribute("data-key");
+        if (translations[lang][key]) {
+          if (element.tagName === "INPUT" && element.hasAttribute("placeholder")) {
+            element.placeholder = translations[lang][key];
+          } else {
+            element.textContent = translations[lang][key];
+          }
+        }
+      });
+    }
+
+    // --- Lógica de Supabase ---
     const SUPABASE_URL = "https://farvkpxcefmeauzdgnla.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhcnZrcHhjZWZtZWF1emRnbmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzOTM5OTMsImV4cCI6MjEwNzk2OTk5M30.G1_sqn1l7ZAEZm6mk7t1PqNTBGCnqHbLlSNBPw-_yT8";
 
@@ -88,7 +181,7 @@
 
       btn.disabled = true;
       status.className = 'status';
-      status.textContent = 'Enviando...';
+      status.textContent = translations[currentLang].sending;
 
       try {
         const { data, error } = await supabaseClient
@@ -103,7 +196,7 @@
           status.textContent = `Error: ${error.message}`;
         } else {
           status.className = 'status success';
-          status.textContent = '¡Enviado con éxito!';
+          status.textContent = translations[currentLang].success;
           input.value = '';
           setTimeout(() => { status.textContent = ''; }, 3000);
         }
@@ -111,7 +204,7 @@
         btn.disabled = false;
         console.error("Excepción inesperada:", err);
         status.className = 'status error';
-        status.textContent = 'Error de conexión con el servidor.';
+        status.textContent = translations[currentLang].errorConn;
       }
     });
   </script>
