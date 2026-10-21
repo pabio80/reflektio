@@ -43,7 +43,7 @@
     /* Contenedor del Logotipo */
     .logo-container {
       width: 100%;
-      max-width: 260px;
+      max-width: 280px;
       margin-bottom: 25px;
       display: flex;
       justify-content: center;
@@ -106,8 +106,7 @@
 
   <!-- Logotipo Corporativo -->
   <div class="logo-container">
-    <!-- Asegúrate de cambiar 'logo.jpg' por el nombre real de tu archivo de imagen subido a la carpeta public/ -->
-    <img src="logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
+    <img src="IO creative technology b_n circle_2.jpg" alt="I/O Creative Technology" class="responsive-logo">
   </div>
 
   <div class="container">
@@ -116,7 +115,7 @@
       <input type="text" class="userText" data-key="placeholder" placeholder="Escribe algo aquí..." maxlength="280" required autocomplete="off">
       <button type="submit" class="submitBtn" data-key="submit">Enviar</button>
     </form>
-    <div class="status" data-status-default=""></div>
+    <div class="status"></div>
   </div>
 
   <script>
@@ -145,11 +144,11 @@
     function setLanguage(lang) {
       currentLang = lang;
       
-      // Actualizar botones activos
+      // Actualizar estilo visual de los botones de idioma
       document.getElementById('btn-es').classList.toggle('active', lang === 'es');
       document.getElementById('btn-ca').classList.toggle('active', lang === 'ca');
 
-      // Traducir elementos estáticos
+      // Traducir elementos de la interfaz
       document.querySelectorAll("[data-key]").forEach(element => {
         const key = element.getAttribute("data-key");
         if (translations[lang][key]) {
