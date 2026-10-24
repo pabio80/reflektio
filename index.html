@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #0f0f11;
@@ -17,7 +18,26 @@
       align-items: center;
       min-height: 100vh;
       padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
+
+    /* Imagen de fondo fija con 50% de opacidad */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('/bg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.5; /* 50% de transparencia */
+      z-index: -1;  /* Se mantiene por detrás de todo el contenido */
+    }
+
     /* Selector de idioma */
     .lang-selector {
       position: absolute;
@@ -25,21 +45,24 @@
       right: 20px;
       display: flex;
       gap: 8px;
+      z-index: 10;
     }
     .lang-selector button {
-      background: #1a1a1e;
+      background: rgba(26, 26, 30, 0.85);
       border: 1px solid #3a3a42;
       color: #fff;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
+      backdrop-filter: blur(4px);
       transition: background 0.2s, border-color 0.2s;
     }
     .lang-selector button:hover, .lang-selector button.active {
       background: #6366f1;
       border-color: #6366f1;
     }
+
     /* Contenedor del Logotipo */
     .logo-container {
       width: 100%;
@@ -48,21 +71,26 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      z-index: 2;
     }
     .responsive-logo {
       width: 100%;
       height: auto;
       object-fit: contain;
+      filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.7));
     }
+
     /* Contenedor del formulario */
     .container {
       width: 100%;
       max-width: 450px;
-      background: #1a1a1e;
+      background: rgba(26, 26, 30, 0.9); /* Fondo ligeramente translúcido para fundir con el cartel */
+      backdrop-filter: blur(10px);        /* Efecto de cristal translúcido */
       padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border: 1px solid #2a2a30;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 2;
     }
     h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
     form { display: flex; flex-direction: column; gap: 15px; }
@@ -71,7 +99,7 @@
       padding: 14px 18px;
       border-radius: 10px;
       border: 1px solid #3a3a42;
-      background: #0f0f11;
+      background: rgba(15, 15, 17, 0.8);
       color: #fff;
       font-size: 1rem;
       outline: none;
@@ -106,8 +134,8 @@
 
   <!-- Logotipo Corporativo -->
   <div class="logo-container">
-  <img src="/logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
-</div>
+    <img src="/logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
+  </div>
 
   <div class="container">
     <h1 data-key="title">Envía tu mensaje</h1>
@@ -144,11 +172,9 @@
     function setLanguage(lang) {
       currentLang = lang;
       
-      // Actualizar estilo visual de los botones de idioma
       document.getElementById('btn-es').classList.toggle('active', lang === 'es');
       document.getElementById('btn-ca').classList.toggle('active', lang === 'ca');
 
-      // Traducir elementos de la interfaz
       document.querySelectorAll("[data-key]").forEach(element => {
         const key = element.getAttribute("data-key");
         if (translations[lang][key]) {
