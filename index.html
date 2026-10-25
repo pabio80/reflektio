@@ -34,8 +34,8 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      opacity: 1; /* 100% opacidad (sin transparencia) */
-      z-index: -1;  /* Se mantiene por detrás de todo el contenido */
+      opacity: 1;
+      z-index: -1;
     }
 
     /* Selector de idioma */
@@ -63,27 +63,6 @@
       border-color: #6366f1;
     }
 
-    /* Contenedor del Logotipo */
-    .logo-container {
-      width: 100%;
-      max-width: 280px;
-      margin-bottom: 25px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2;
-    }
-    .responsive-logo {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.8));
-      
-      /* Efecto de difuminado/desvanecimiento en los bordes */
-      mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-      -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-    }
-
     /* Contenedor del formulario */
     .container {
       width: 100%;
@@ -95,6 +74,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.8);
       border: 1px solid rgba(255, 255, 255, 0.15);
       z-index: 2;
+      margin-bottom: 25px;
     }
     h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
     form { display: flex; flex-direction: column; gap: 15px; }
@@ -126,19 +106,34 @@
     .status { margin-top: 15px; text-align: center; font-size: 0.9rem; min-height: 20px; }
     .success { color: #10b981; }
     .error { color: #ef4444; }
+
+    /* Contenedor del Logotipo (Ubicado abajo) */
+    .logo-container {
+      width: 100%;
+      max-width: 220px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+    .responsive-logo {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.8));
+      
+      /* Efecto de difuminado circular en los bordes */
+      mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+    }
   </style>
 </head>
 <body>
 
   <!-- Selector de Idioma -->
   <div class="lang-selector">
-    <button id="btn-es" class="active" onclick="setLanguage('es')">ES</button>
-    <button id="btn-ca" onclick="setLanguage('ca')">CA</button>
-  </div>
-
-  <!-- Logotipo Corporativo -->
-  <div class="logo-container">
-    <img src="/logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
+    <button id="btn-es" class="active" onclick="setLanguage('es')">CAS</button>
+    <button id="btn-ca" onclick="setLanguage('ca')">CAT</button>
   </div>
 
   <div class="container">
@@ -148,6 +143,11 @@
       <button type="submit" class="submitBtn" data-key="submit">Enviar</button>
     </form>
     <div class="status"></div>
+  </div>
+
+  <!-- Logotipo Corporativo situado abajo -->
+  <div class="logo-container">
+    <img src="/logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
   </div>
 
   <script>
