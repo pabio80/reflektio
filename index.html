@@ -65,7 +65,7 @@
       border-color: #6366f1;
     }
 
-    /* Contenedor del formulario con degradado semitransparente */
+    /* Contenedor único del formulario con degradado semitransparente */
     .container {
       width: 100%;
       max-width: 450px;
@@ -130,7 +130,7 @@
     .success { color: #10b981; }
     .error { color: #ef4444; }
 
-    /* Contenedor del Logotipo (Agrandado y con mayor difuminado transparente) */
+    /* Contenedor del Logotipo situado abajo */
     .logo-container {
       width: 100%;
       max-width: 440px;
@@ -145,7 +145,6 @@
       object-fit: contain;
       filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.8));
       
-      /* Mayor transición de degradado a transparente */
       mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 85%);
       -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 85%);
     }
@@ -159,15 +158,16 @@
     <button id="btn-ca" onclick="setLanguage('ca')">CAT</button>
   </div>
 
-  <div class="container">
+  <!-- Único contenedor de mensaje -->
+  <main class="container">
     <h1 data-key="title">EL MUNDO SERÍA MUCHO MEJOR SI…</h1>
     <p class="subtitle" data-key="subtitle">Completa la frase. Tienes una oportunidad para arreglar el mundo en una sola línea.</p>
-    <form class="textForm">
+    <form class="textForm" id="mainForm">
       <input type="text" class="userText" data-key="placeholder" placeholder="Completa la frase aquí..." maxlength="280" required autocomplete="off">
       <button type="submit" class="submitBtn" data-key="submit">Enviar</button>
     </form>
     <div class="status"></div>
-  </div>
+  </main>
 
   <!-- Logotipo Corporativo situado abajo -->
   <div class="logo-container">
@@ -223,10 +223,10 @@
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const form = document.querySelector('.textForm');
+    const form = document.getElementById('mainForm');
     const input = form.querySelector('.userText');
     const btn = form.querySelector('.submitBtn');
-    const status = form.parentElement.querySelector('.status');
+    const status = document.querySelector('.container .status');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -239,258 +239,7 @@
       status.textContent = translations[currentLang].sending;
 
       try {
-        const { data, error } = await supabaseClient
-          .from('messages')
-          .insert([{ text: textValue }]);
-
-        btn.disabled = false;
-
-        if (error) {
-          console.error("Error devuelto por Supabase:", error);
-          status.className = 'status error';
-          status.textContent = `Error: ${error.message}`;
-        } else {
-          status.className = 'status success';
-          status.textContent = translations[currentLang].success;
-          input.value = '';
-          setTimeout(() => { status.textContent = ''; }, 3000);
-        }
-      } catch (err) {
-        btn.disabled = false;
-        console.error("Excepción inesperada:", err);
-        status.className = 'status error';
-        status.textContent = translations[currentLang].errorConn;
-      }
-    });
-  </script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Envía tu texto - I/O Creative Technology</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #0f0f11;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Imagen de fondo fija */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('/bg.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 1;
-      z-index: -1;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-    }
-
-    /* Selector de idioma */
-    .lang-selector {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      gap: 8px;
-      z-index: 10;
-    }
-    .lang-selector button {
-      background: rgba(26, 26, 30, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      backdrop-filter: blur(8px);
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .lang-selector button:hover, .lang-selector button.active {
-      background: #6366f1;
-      border-color: #6366f1;
-    }
-
-    /* Contenedor del formulario con degradado semitransparente */
-    .container {
-      width: 100%;
-      max-width: 450px;
-      background: linear-gradient(135deg, rgba(26, 26, 30, 0.85) 0%, rgba(15, 15, 20, 0.55) 100%);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      z-index: 2;
-      margin-bottom: 25px;
-    }
-    h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
-    form { display: flex; flex-direction: column; gap: 15px; }
-    
-    /* Campo de texto con degradado transparente */
-    input[type="text"] {
-      width: 100%;
-      padding: 14px 18px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: linear-gradient(180deg, rgba(15, 15, 17, 0.65) 0%, rgba(10, 10, 12, 0.35) 100%);
-      color: #fff;
-      font-size: 1rem;
-      outline: none;
-      backdrop-filter: blur(4px);
-      transition: border-color 0.2s, background 0.2s;
-    }
-    input[type="text"]:focus { 
-      border-color: #6366f1;
-      background: linear-gradient(180deg, rgba(20, 20, 25, 0.8) 0%, rgba(15, 15, 20, 0.5) 100%);
-    }
-    
-    button.submitBtn {
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      background: #6366f1;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button.submitBtn:hover { background: #4f46e5; }
-    button.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .status { margin-top: 15px; text-align: center; font-size: 0.9rem; min-height: 20px; }
-    .success { color: #10b981; }
-    .error { color: #ef4444; }
-
-    /* Contenedor del Logotipo (Agrandado y con mayor difuminado transparente) */
-    .logo-container {
-      width: 100%;
-      max-width: 440px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2;
-    }
-    .responsive-logo {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.8));
-      
-      /* Mayor transición de degradado a transparente */
-      mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 85%);
-      -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 85%);
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Selector de Idioma -->
-  <div class="lang-selector">
-    <button id="btn-es" class="active" onclick="setLanguage('es')">CAS</button>
-    <button id="btn-ca" onclick="setLanguage('ca')">CAT</button>
-  </div>
-
-  <div class="container">
-    <h1 data-key="title">Envía tu mensaje</h1>
-    <form class="textForm">
-      <input type="text" class="userText" data-key="placeholder" placeholder="Escribe algo aquí..." maxlength="280" required autocomplete="off">
-      <button type="submit" class="submitBtn" data-key="submit">Enviar</button>
-    </form>
-    <div class="status"></div>
-  </div>
-
-  <!-- Logotipo Corporativo situado abajo -->
-  <div class="logo-container">
-    <img src="/logo.jpg" alt="I/O Creative Technology" class="responsive-logo">
-  </div>
-
-  <script>
-    // --- Sistema Multilingüe ---
-    const translations = {
-      es: {
-        title: "Envía tu mensaje",
-        placeholder: "Escribe algo aquí...",
-        submit: "Enviar",
-        sending: "Enviando...",
-        success: "¡Enviado con éxito!",
-        errorConn: "Error de conexión con el servidor."
-      },
-      ca: {
-        title: "Escriu el teu missatge",
-        placeholder: "Escriu alguna cosa aquí...",
-        submit: "Enviar",
-        sending: "Enviant...",
-        success: "Enviat amb èxit!",
-        errorConn: "Error de connexió amb el servidor."
-      }
-    };
-
-    let currentLang = 'es';
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      
-      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
-      document.getElementById('btn-ca').classList.toggle('active', lang === 'ca');
-
-      document.querySelectorAll("[data-key]").forEach(element => {
-        const key = element.getAttribute("data-key");
-        if (translations[lang][key]) {
-          if (element.tagName === "INPUT" && element.hasAttribute("placeholder")) {
-            element.placeholder = translations[lang][key];
-          } else {
-            element.textContent = translations[lang][key];
-          }
-        }
-      });
-    }
-
-    // --- Lógica de Supabase ---
-    const SUPABASE_URL = "https://farvkpxcefmeauzdgnla.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhcnZrcHhjZWZtZWF1emRnbmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzOTM5OTMsImV4cCI6MjEwNzk2OTk5M30.G1_sqn1l7ZAEZm6mk7t1PqNTBGCnqHbLlSNBPw-_yT8";
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const form = document.querySelector('.textForm');
-    const input = form.querySelector('.userText');
-    const btn = form.querySelector('.submitBtn');
-    const status = form.parentElement.querySelector('.status');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const textValue = input.value.trim();
-
-      if (!textValue) return;
-
-      btn.disabled = true;
-      status.className = 'status';
-      status.textContent = translations[currentLang].sending;
-
-      try {
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
           .from('messages')
           .insert([{ text: textValue }]);
 
